@@ -1,4 +1,4 @@
-course_name,session_length,num_sessions_per_week,is_large_class,10_percent_rule_exempted,is_a_TA_session,mustOnDays,start_time,end_time,Note
+course_name,session_length,num_sessions_per_week,is_large_class,10_percent_rule_exempted,10_percent_rule_exempted,mustOnDays,start_time,end_time,Note
 200,50,3,1,0,0,MWF,-,15:20,"200 has 9 TA sessions, 5 TAs, all on TR"
 200AA,50,2,0,0,1,TR,-,17:20,
 200AB,50,2,0,0,1,TR,-,17:20,
