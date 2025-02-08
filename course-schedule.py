@@ -172,17 +172,54 @@ from pulp import *
 # )
 
 # define the problem
-prob = pulp.LpProblem("HW4", pulp.lpSum)
+prob = LpProblem("HW4", LpMaximize)
 
 # define decision variables
-x = pulp.LpVariable.dicts('course_', ((courses_this_quarter[course.name], t) for course in courses_this_quarter for t in time_slots), cat='Binary')    # x_c,t
+x = pulp.LpVariable.dicts('course_', ((course.name, t) for course in courses_this_quarter for t in time_slots), cat='Binary')    # x_c,t
 
 # additional decision variables
 
 # Objective function is first
 #prob += pulp.LpMaximize()
 
-prob += pulp.lpSum(x[c] for c in course_information)
+prob += pulp.lpSum(x[course.name, t] for course in courses_this_quarter for t in time_slots)
+
+# Constraints
+# Each course must be scheduled exactly once
+# for course in courses_this_quarter:
+#     prob += pulp.lpSum(x[course.name, t] for t in time_slots) == 1
+
+# determine the length of each class and the number of sessions per week
+for course in course_information:
+    prob += pulp.lpSum(x[course.session_length, t] for t in time_slots) == course.session_length
+
+# constraints for ##-minute classes
+for course in course_information:
+    if course.length == 50:
+        allowed_start_times = [8.5, 9.5, 10.5, 11.5, 12.5, 13.5]  # Represented in hours
+        for time_slot in time_slots:
+            if time_slot not in allowed_start_times:
+                prob += x[course.name, time_slot] == 0
+    if course.length == 80:
+        allowed_start_times = [8.5, 10, 11.5, 13]
+        for time_slot in time_slots:
+            if time_slot not in allowed_start_times:
+                prob += x[course.name, time_slot] == 0
+    if course.length == 110:
+        allowed_start_times = [8.5, 10.5, 12.5, 13.5]
+        for time_slot in time_slots:
+            if time_slot not in allowed_start_times:
+                prob += x[course.name, time_slot] == 0
+
+
+
+
 
 # solve
 prob.solve()
+
+# print the optimal solution
+for course in courses_this_quarter:
+    for t in time_slots:
+        if pulp.value(x[course.name, t]) == 1:
+            print(f"Course {course.name} is scheduled at time slot {t}")
